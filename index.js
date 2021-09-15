@@ -15,13 +15,14 @@ export const methodType = {
   Del: "DELETE",
   Put: "PUT",
 };
-export const dataToSend = { content: {} };
+
 export const type = {
   json: "json",
   formData: "formData",
   text: "text",
   blob: "blob",
 };
+export const dataToSend = { content: {}, type: type.json };
 export const dataToGet = {
   type: type.json,
   callback: (data) => console.log(data),
@@ -36,25 +37,31 @@ export const fetchData = (
   getToken
 ) => {
   const option = { method, headers: new Headers() };
-  if (dataSend !== null) {
-    dataSend.type === "json"
-      ? (option.body = JSON.stringify(dataSend.content))
-      : (option.body = dataSend.content);
-  }
+  /*if (dataSend !== null) {
+    dataSend.type !== "json"
+      ? (option.body = dataSend.content) 
+      :(option.body = JSON.stringify(dataSend.content));
 
+  }*/
+  if (dataSend !== null) {
+    option.body = dataSend.content;
+  }
+  if (dataSend != null) {
+    if (dataSend.type !== null) {
+      option.headers.append(
+        "Content-Type",
+        dataSend.type === "json"
+          ? "application/json"
+          : dataSend.type === "formData"
+          ? "multipart/form-data"
+          : dataSend.type == "text"
+          ? "text/plain"
+          : "application/octet-stream"
+      );
+    }
+  }
   option.headers.append(
     "Accept",
-    dataGet.type === "json"
-      ? "application/json"
-      : dataGet.type === "formData"
-      ? "multipart/form-data"
-      : dataGet.type == "text"
-      ? "text/plain"
-      : "application/octet-stream"
-  );
-
-  option.headers.append(
-    "Content-Type",
     dataGet.type === "json"
       ? "application/json"
       : dataGet.type === "formData"
